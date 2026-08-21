@@ -54,7 +54,7 @@ fun SuppliersScreen(onOpenMenu: () -> Unit) {
         InventixTopBar(title = "Suppliers", showBack = false, onLeadingClick = onOpenMenu)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {

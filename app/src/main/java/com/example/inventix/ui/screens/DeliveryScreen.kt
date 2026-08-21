@@ -13,9 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocalShipping
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,15 +47,19 @@ import com.example.inventix.ui.theme.MutedText
 import com.example.inventix.ui.theme.UnselectedTabBlack
 
 @Composable
-fun DeliveryScreen(onOpenMenu: () -> Unit) {
+fun DeliveryScreen(hasDeliveries: Boolean, onOpenMenu: () -> Unit) {
     var search by remember { mutableStateOf("") }
     var selectedTab by remember { mutableStateOf(BadgeType.IN_TRANSIT) }
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         InventixTopBar(title = "Delivery", showBack = false, onLeadingClick = onOpenMenu)
+        if (!hasDeliveries) {
+            NoDeliveriesYetState()
+            return@Column
+        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
@@ -167,5 +175,31 @@ private fun DeliveryCard(delivery: com.example.inventix.ui.data.Delivery) {
                 fontFamily = Inter
             )
         }
+    }
+}
+
+@Composable
+private fun NoDeliveriesYetState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.LocalShipping,
+            contentDescription = null,
+            tint = MutedText,
+            modifier = Modifier.size(56.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "No items yet",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = DarkValue,
+            fontFamily = Inter
+        )
     }
 }

@@ -17,6 +17,9 @@ class AppViewModel : ViewModel() {
     var hasOrders by mutableStateOf(false)
         private set
 
+    var hasDeliveries by mutableStateOf(false)
+        private set
+
     fun chooseRole(newRole: UserRole) {
         role = newRole
     }
@@ -29,5 +32,6 @@ class AppViewModel : ViewModel() {
         role = null
         hasProducts = false
         hasOrders = false
+        hasDeliveries = false
     }
 }

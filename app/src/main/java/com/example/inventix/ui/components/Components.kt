@@ -363,7 +363,7 @@ fun PrimaryButton(
         Text(
             text = text,
             fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             color = ButtonTextAmber,
             fontFamily = Inter
         )

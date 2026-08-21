@@ -120,6 +120,7 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit) {
                 Text(
                     text = "Forgot password?",
                     fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
                     color = MaroonPrimary,
                     modifier = Modifier
                         .fillMaxWidth()

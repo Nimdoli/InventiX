@@ -285,7 +285,7 @@ private fun SupplierProductsContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp
+            start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {

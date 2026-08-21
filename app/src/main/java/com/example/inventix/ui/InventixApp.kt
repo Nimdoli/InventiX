@@ -122,7 +122,10 @@ fun InventixApp(appViewModel: AppViewModel) {
                 ReportsScreen(onOpenMenu = { navController.navigate(Routes.MENU) })
             }
             composable(Routes.DELIVERY) {
-                DeliveryScreen(onOpenMenu = { navController.navigate(Routes.MENU) })
+                DeliveryScreen(
+                    hasDeliveries = appViewModel.hasDeliveries,
+                    onOpenMenu = { navController.navigate(Routes.MENU) }
+                )
             }
             composable(Routes.SUPPLIERS) {
                 SuppliersScreen(onOpenMenu = { navController.navigate(Routes.MENU) })
