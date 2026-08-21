@@ -19,19 +19,23 @@ import com.example.inventix.ui.screens.LoginScreen
 import com.example.inventix.ui.screens.MenuScreen
 import com.example.inventix.ui.screens.OrdersScreen
 import com.example.inventix.ui.screens.ProductsScreen
+import com.example.inventix.ui.screens.ProfileScreen
 import com.example.inventix.ui.screens.PurchaseOrderScreen
 import com.example.inventix.ui.screens.ReportsScreen
+import com.example.inventix.ui.screens.SignUpScreen
 import com.example.inventix.ui.screens.SuppliersScreen
 
 object Routes {
     const val CHOOSE_ROLE = "choose_role"
     const val LOGIN = "login"
+    const val SIGN_UP = "sign_up"
     const val PRODUCTS = "products"
     const val ORDERS = "orders"
     const val REPORTS = "reports"
     const val DELIVERY = "delivery"
     const val SUPPLIERS = "suppliers"
     const val MENU = "menu"
+    const val PROFILE = "profile"
     const val PURCHASE_ORDER = "purchase_order"
 }
 
@@ -83,7 +87,19 @@ fun InventixApp(appViewModel: AppViewModel) {
                             popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    onSignUp = { navController.navigate(Routes.SIGN_UP) }
+                )
+            }
+            composable(Routes.SIGN_UP) {
+                SignUpScreen(
+                    onCreateAccount = {
+                        navController.navigate(Routes.PRODUCTS) {
+                            popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onBackToLogin = { navController.popBackStack() }
                 )
             }
             composable(Routes.PRODUCTS) {
@@ -114,6 +130,7 @@ fun InventixApp(appViewModel: AppViewModel) {
             composable(Routes.MENU) {
                 MenuScreen(
                     onBack = { navController.popBackStack() },
+                    onOpenProfile = { navController.navigate(Routes.PROFILE) },
                     onLogout = {
                         appViewModel.logout()
                         navController.navigate(Routes.CHOOSE_ROLE) {
@@ -121,6 +138,9 @@ fun InventixApp(appViewModel: AppViewModel) {
                         }
                     }
                 )
+            }
+            composable(Routes.PROFILE) {
+                ProfileScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.PURCHASE_ORDER) {
                 PurchaseOrderScreen(onBack = { navController.popBackStack() })

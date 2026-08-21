@@ -58,7 +58,7 @@ fun DeliveryScreen(onOpenMenu: () -> Unit) {
                 InventixSearchField(
                     value = search,
                     onValueChange = { search = it },
-                    placeholder = "Search deliveries..."
+                    placeholder = "Search products..."
                 )
             }
             item {

@@ -88,27 +88,29 @@ fun InventixTopBar(
             .background(TopBarYellow)
             .statusBarsPadding()
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 4.dp)
         ) {
-            IconButton(onClick = onLeadingClick) {
+            IconButton(
+                onClick = onLeadingClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
                 Icon(
                     imageVector = if (showBack) Icons.AutoMirrored.Outlined.ArrowBack else Icons.Outlined.Menu,
                     contentDescription = null,
                     tint = TopBarTitleBrown
                 )
             }
-            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = TopBarTitleBrown,
-                fontFamily = Inter
+                fontFamily = Inter,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }

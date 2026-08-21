@@ -50,6 +50,7 @@ import com.example.inventix.ui.theme.MutedText
 @Composable
 fun MenuScreen(
     onBack: () -> Unit,
+    onOpenProfile: () -> Unit,
     onLogout: () -> Unit
 ) {
     Column(
@@ -66,7 +67,7 @@ fun MenuScreen(
         ) {
             ProfileCard()
             Spacer(modifier = Modifier.height(16.dp))
-            MenuItemsCard()
+            MenuItemsCard(onOpenProfile = onOpenProfile)
             Spacer(modifier = Modifier.height(24.dp))
             Box(
                 modifier = Modifier
@@ -132,7 +133,7 @@ private fun ProfileCard() {
 }
 
 @Composable
-private fun MenuItemsCard() {
+private fun MenuItemsCard(onOpenProfile: () -> Unit) {
     val shape = RoundedCornerShape(10.dp)
     Column(
         modifier = Modifier
@@ -142,7 +143,7 @@ private fun MenuItemsCard() {
             .border(1.dp, BorderBeige, shape)
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
-        MenuRow(icon = Icons.Outlined.Person, label = "My Profile")
+        MenuRow(icon = Icons.Outlined.Person, label = "My Profile", onClick = onOpenProfile)
         HorizontalDivider(color = BorderBeige, thickness = 1.dp)
         MenuRow(icon = Icons.Outlined.Lock, label = "Change Password")
         HorizontalDivider(color = BorderBeige, thickness = 1.dp)
@@ -158,12 +159,13 @@ private fun MenuItemsCard() {
 private fun MenuRow(
     icon: ImageVector,
     label: String,
-    trailing: String? = null
+    trailing: String? = null,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable(onClick = onClick)
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
