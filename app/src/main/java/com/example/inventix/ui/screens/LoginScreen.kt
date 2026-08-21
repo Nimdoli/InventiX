@@ -127,7 +127,7 @@ fun LoginScreen(onLogin: () -> Unit) {
                     fontFamily = Inter
                 )
             }
-            PrimaryButton(text = "Login", onClick = onLogin)
+            PrimaryButton(text = "Login", onClick = onLogin, modifier = Modifier.fillMaxWidth())
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

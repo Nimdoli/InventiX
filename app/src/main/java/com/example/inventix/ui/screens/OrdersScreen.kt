@@ -13,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +51,7 @@ import com.example.inventix.ui.theme.UnselectedTabBlack
 
 @Composable
 fun OrdersScreen(
+    hasOrders: Boolean,
     onOpenMenu: () -> Unit,
     onOpenOrder: () -> Unit
 ) {
@@ -55,6 +60,10 @@ fun OrdersScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         InventixTopBar(title = "Orders", showBack = false, onLeadingClick = onOpenMenu)
+        if (!hasOrders) {
+            NoOrdersYetState()
+            return@Column
+        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
@@ -162,5 +171,31 @@ private fun OrderCard(order: com.example.inventix.ui.data.Order, onClick: () -> 
                 fontFamily = Inter
             )
         }
+    }
+}
+
+@Composable
+private fun NoOrdersYetState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+            contentDescription = null,
+            tint = MutedText,
+            modifier = Modifier.size(56.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "No orders yet",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = DarkValue,
+            fontFamily = Inter
+        )
     }
 }

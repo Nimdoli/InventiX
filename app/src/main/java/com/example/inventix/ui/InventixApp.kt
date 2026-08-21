@@ -97,6 +97,7 @@ fun InventixApp(appViewModel: AppViewModel) {
             }
             composable(Routes.ORDERS) {
                 OrdersScreen(
+                    hasOrders = appViewModel.hasOrders,
                     onOpenMenu = { navController.navigate(Routes.MENU) },
                     onOpenOrder = { navController.navigate(Routes.PURCHASE_ORDER) }
                 )

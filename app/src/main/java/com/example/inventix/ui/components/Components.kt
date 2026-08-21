@@ -20,8 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Tune
@@ -127,10 +128,10 @@ fun InventixBottomBar(
     onSelect: (String) -> Unit
 ) {
     val customerTabs = listOf(
-        BottomTab("Dashboard", Icons.Outlined.Home, "delivery", setOf("delivery")),
-        BottomTab("Inventory", Icons.Outlined.Inventory2, "products", setOf("products")),
-        BottomTab("Orders", Icons.AutoMirrored.Outlined.ReceiptLong, "orders", setOf("orders")),
-        BottomTab("Reports", Icons.Outlined.BarChart, "reports", setOf("reports"))
+        BottomTab("Stocks", Icons.Outlined.Inventory2, "products", setOf("products")),
+        BottomTab("Reports", Icons.Outlined.BarChart, "reports", setOf("reports")),
+        BottomTab("Delivery", Icons.Outlined.LocalShipping, "delivery", setOf("delivery")),
+        BottomTab("Suppliers", Icons.Outlined.Group, "suppliers", setOf("suppliers"))
     )
     val supplierTabs = listOf(
         BottomTab("Stocks", Icons.Outlined.Inventory2, "products", setOf("products")),

@@ -57,7 +57,6 @@ import com.example.inventix.ui.theme.DarkHeading
 import com.example.inventix.ui.theme.DarkValue
 import com.example.inventix.ui.theme.Inter
 import com.example.inventix.ui.theme.MutedText
-import com.example.inventix.ui.theme.PageTitleOlive
 import com.example.inventix.ui.theme.SupplierAddGold
 import com.example.inventix.ui.theme.UnselectedTabBlack
 
@@ -134,15 +133,6 @@ private fun CustomerProductsContent() {
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            Text(
-                text = "Products",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = PageTitleOlive,
-                fontFamily = Inter
-            )
-        }
         item {
             InventixSearchField(
                 value = search,
