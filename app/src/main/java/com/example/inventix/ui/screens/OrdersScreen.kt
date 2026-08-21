@@ -78,7 +78,7 @@ fun OrdersScreen(
             }
             item {
                 Column {
-                    Row(horizontalArrangement = Arrangement.spacedBy(28.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                         Text(
                             text = "Pending",
                             fontSize = 14.sp,

@@ -144,7 +144,7 @@ private fun CustomerProductsContent() {
         item { StockOverviewCard() }
         item {
             Column {
-                Row(horizontalArrangement = Arrangement.spacedBy(28.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     Text(
                         text = "In stock",
                         fontSize = 14.sp,

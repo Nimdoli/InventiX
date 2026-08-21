@@ -91,7 +91,7 @@ fun InventixTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(46.dp)
                 .padding(horizontal = 4.dp)
         ) {
             IconButton(
