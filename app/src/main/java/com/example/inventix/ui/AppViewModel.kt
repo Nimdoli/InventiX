@@ -11,7 +11,7 @@ class AppViewModel : ViewModel() {
     var role by mutableStateOf<UserRole?>(null)
         private set
 
-    var hasProducts by mutableStateOf(true)
+    var hasProducts by mutableStateOf(false)
         private set
 
     fun chooseRole(newRole: UserRole) {

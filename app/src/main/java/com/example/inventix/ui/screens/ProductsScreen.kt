@@ -74,7 +74,7 @@ fun ProductsScreen(
         when {
             !hasProducts -> EmptyProductsState(onAddProducts)
             role == UserRole.CUSTOMER -> CustomerProductsContent()
-            else -> SupplierProductsContent(onOpenPurchaseOrder)
+            else -> SupplierProductsContent(onAddProducts, onOpenPurchaseOrder)
         }
     }
 }
@@ -286,7 +286,10 @@ private fun DonutChart(segments: List<DonutSegment>, total: Int) {
 }
 
 @Composable
-private fun SupplierProductsContent(onOpenPurchaseOrder: () -> Unit) {
+private fun SupplierProductsContent(
+    onAddProducts: () -> Unit,
+    onOpenPurchaseOrder: () -> Unit
+) {
     var search by remember { mutableStateOf("") }
 
     LazyColumn(
@@ -310,7 +313,7 @@ private fun SupplierProductsContent(onOpenPurchaseOrder: () -> Unit) {
                     modifier = Modifier
                         .clip(RoundedCornerShape(5.dp))
                         .background(SupplierAddGold)
-                        .clickable(onClick = onOpenPurchaseOrder)
+                        .clickable(onClick = onAddProducts)
                         .padding(horizontal = 12.dp, vertical = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
