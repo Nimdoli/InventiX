@@ -2,6 +2,7 @@ package com.example.inventix.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,9 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Numbers
+import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,25 +42,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.inventix.ui.components.InventixSearchField
 import com.example.inventix.ui.components.InventixTopBar
+import com.example.inventix.ui.components.PillInputField
+import com.example.inventix.ui.components.PrimaryButton
 import com.example.inventix.ui.components.ProductCard
 import com.example.inventix.ui.data.BadgeType
-import com.example.inventix.ui.data.CustomerProducts
 import com.example.inventix.ui.data.DonutSegment
+import com.example.inventix.ui.data.Product
 import com.example.inventix.ui.data.StockOverviewSegments
-import com.example.inventix.ui.data.SupplierProducts
 import com.example.inventix.ui.data.UserRole
 import com.example.inventix.ui.theme.AccentYellow
 import com.example.inventix.ui.theme.ActiveGreen
 import com.example.inventix.ui.theme.AddButtonBrown
+import com.example.inventix.ui.theme.AmberLowStockText
 import com.example.inventix.ui.theme.BorderBeige
 import com.example.inventix.ui.theme.CreamSurface
 import com.example.inventix.ui.theme.DarkHeading
 import com.example.inventix.ui.theme.DarkValue
+import com.example.inventix.ui.theme.GoldTintBg
+import com.example.inventix.ui.theme.GreenInStockBg
+import com.example.inventix.ui.theme.GreenInStockText
 import com.example.inventix.ui.theme.Inter
 import com.example.inventix.ui.theme.MutedText
 import com.example.inventix.ui.theme.SupplierAddGold
@@ -63,18 +76,34 @@ import com.example.inventix.ui.theme.UnselectedTabBlack
 @Composable
 fun ProductsScreen(
     role: UserRole,
-    hasProducts: Boolean,
-    onAddProducts: () -> Unit,
+    products: List<Product>,
+    onAddProduct: (Product) -> Unit,
     onOpenMenu: () -> Unit,
     onOpenPurchaseOrder: () -> Unit
 ) {
+    var showAddDialog by remember { mutableStateOf(false) }
+
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         InventixTopBar(title = "Products", showBack = false, onLeadingClick = onOpenMenu)
         when {
-            !hasProducts -> EmptyProductsState(onAddProducts)
-            role == UserRole.CUSTOMER -> CustomerProductsContent()
-            else -> SupplierProductsContent(onAddProducts, onOpenPurchaseOrder)
+            products.isEmpty() -> EmptyProductsState(onAddProducts = { showAddDialog = true })
+            role == UserRole.CUSTOMER -> CustomerProductsContent(products)
+            else -> SupplierProductsContent(
+                products = products,
+                onAddProducts = { showAddDialog = true },
+                onOpenPurchaseOrder = onOpenPurchaseOrder
+            )
         }
+    }
+
+    if (showAddDialog) {
+        AddProductDialog(
+            onConfirm = { product ->
+                onAddProduct(product)
+                showAddDialog = false
+            },
+            onDismiss = { showAddDialog = false }
+        )
     }
 }
 
@@ -122,7 +151,7 @@ private fun EmptyProductsState(onAddProducts: () -> Unit) {
 }
 
 @Composable
-private fun CustomerProductsContent() {
+private fun CustomerProductsContent(products: List<Product>) {
     var search by remember { mutableStateOf("") }
     var lowStockOnly by remember { mutableStateOf(false) }
 
@@ -171,10 +200,10 @@ private fun CustomerProductsContent() {
                 )
             }
         }
-        val products = CustomerProducts
+        val visibleProducts = products
             .filter { if (lowStockOnly) it.status == BadgeType.LOW_STOCK else true }
             .filter { it.name.contains(search, ignoreCase = true) }
-        items(products) { product ->
+        items(visibleProducts) { product ->
             ProductCard(
                 name = product.name,
                 category = product.category,
@@ -277,6 +306,7 @@ private fun DonutChart(segments: List<DonutSegment>, total: Int) {
 
 @Composable
 private fun SupplierProductsContent(
+    products: List<Product>,
     onAddProducts: () -> Unit,
     onOpenPurchaseOrder: () -> Unit
 ) {
@@ -327,10 +357,10 @@ private fun SupplierProductsContent(
                 fontFamily = Inter
             )
         }
-        val products = SupplierProducts.filter {
+        val visibleProducts = products.filter {
             it.name.contains(search, ignoreCase = true)
         }
-        items(products) { product ->
+        items(visibleProducts) { product ->
             ProductCard(
                 name = product.name,
                 category = product.category,
@@ -344,5 +374,162 @@ private fun SupplierProductsContent(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun AddProductDialog(
+    onConfirm: (Product) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
+    var stockStatus by remember { mutableStateOf(BadgeType.IN_STOCK) }
+
+    val quantityValue = quantity.toIntOrNull()
+    val canSubmit = name.isNotBlank() &&
+        price.isNotBlank() &&
+        quantityValue != null &&
+        quantityValue >= 0
+
+    Dialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = "Add Product",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = DarkHeading,
+                fontFamily = Inter
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            PillInputField(
+                value = name,
+                onValueChange = { name = it },
+                label = "Product Name",
+                leadingIcon = Icons.Outlined.Inventory2
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            PillInputField(
+                value = category,
+                onValueChange = { category = it },
+                label = "Category",
+                leadingIcon = Icons.Outlined.Category
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            PillInputField(
+                value = price,
+                onValueChange = { price = it },
+                label = "Price (LKR)",
+                leadingIcon = Icons.Outlined.Payments
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            PillInputField(
+                value = quantity,
+                onValueChange = { quantity = it },
+                label = "Quantity",
+                leadingIcon = Icons.Outlined.Numbers,
+                keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Stock Status",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = DarkHeading,
+                fontFamily = Inter
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StockStatusOption(
+                    label = "In stock",
+                    selected = stockStatus == BadgeType.IN_STOCK,
+                    containerColor = GreenInStockBg,
+                    contentColor = GreenInStockText,
+                    onSelect = { stockStatus = BadgeType.IN_STOCK },
+                    modifier = Modifier.weight(1f)
+                )
+                StockStatusOption(
+                    label = "Low stock",
+                    selected = stockStatus == BadgeType.LOW_STOCK,
+                    containerColor = GoldTintBg,
+                    contentColor = AmberLowStockText,
+                    onSelect = { stockStatus = BadgeType.LOW_STOCK },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(30.dp))
+                        .clickable(onClick = onDismiss)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MutedText,
+                        fontFamily = Inter
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                PrimaryButton(
+                    text = "Add Product",
+                    onClick = {
+                        onConfirm(
+                            Product(
+                                name = name.trim(),
+                                category = category.ifBlank { "General" },
+                                price = "LKR ${price.trim()}",
+                                stock = quantityValue ?: 0,
+                                status = stockStatus
+                            )
+                        )
+                    },
+                    enabled = canSubmit,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StockStatusOption(
+    label: String,
+    selected: Boolean,
+    containerColor: Color,
+    contentColor: Color,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(10.dp)
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .background(if (selected) containerColor else Color.White)
+            .border(1.dp, if (selected) contentColor else BorderBeige, shape)
+            .clickable(onClick = onSelect)
+            .padding(vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = if (selected) contentColor else MutedText,
+            fontFamily = Inter
+        )
     }
 }

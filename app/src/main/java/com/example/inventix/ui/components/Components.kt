@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -46,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -350,14 +352,15 @@ fun ProductCard(
 fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Box(
         modifier = modifier
             .height(48.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(AccentYellow)
-            .clickable(onClick = onClick),
+            .background(if (enabled) AccentYellow else AccentYellow.copy(alpha = 0.4f))
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -377,6 +380,7 @@ fun PillInputField(
     label: String,
     leadingIcon: ImageVector,
     isPassword: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -406,6 +410,7 @@ fun PillInputField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontSize = 14.sp,
                     color = DarkValue,

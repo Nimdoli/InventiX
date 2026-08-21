@@ -105,8 +105,8 @@ fun InventixApp(appViewModel: AppViewModel) {
             composable(Routes.PRODUCTS) {
                 ProductsScreen(
                     role = appViewModel.role ?: UserRole.CUSTOMER,
-                    hasProducts = appViewModel.hasProducts,
-                    onAddProducts = { appViewModel.addFirstProduct() },
+                    products = appViewModel.products,
+                    onAddProduct = { product -> appViewModel.addProduct(product) },
                     onOpenMenu = { navController.navigate(Routes.MENU) },
                     onOpenPurchaseOrder = { navController.navigate(Routes.PURCHASE_ORDER) }
                 )
