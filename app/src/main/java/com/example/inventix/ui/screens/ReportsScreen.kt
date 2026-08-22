@@ -60,12 +60,12 @@ fun ReportsScreen(onOpenMenu: () -> Unit) {
         InventixTopBar(title = "Reports", showBack = false, onLeadingClick = onOpenMenu)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 6.dp, bottom = 24.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item { DateRangePill() }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(40.dp)) {
                     Text(
                         text = "Sales Reports",
                         fontSize = 14.sp,

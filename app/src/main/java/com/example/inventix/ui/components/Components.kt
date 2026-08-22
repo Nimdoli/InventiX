@@ -58,7 +58,6 @@ import com.example.inventix.ui.theme.AccentYellow
 import com.example.inventix.ui.theme.ActiveGreen
 import com.example.inventix.ui.theme.AmberLowStockText
 import com.example.inventix.ui.theme.BorderBeige
-import com.example.inventix.ui.theme.ButtonTextAmber
 import com.example.inventix.ui.theme.CreamSurface
 import com.example.inventix.ui.theme.DarkValue
 import com.example.inventix.ui.theme.GoldTintBg
@@ -93,7 +92,7 @@ fun InventixTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(46.dp)
+                .height(38.dp)
                 .padding(horizontal = 4.dp)
         ) {
             IconButton(
@@ -359,7 +358,7 @@ fun PrimaryButton(
         modifier = modifier
             .height(48.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(if (enabled) AccentYellow else AccentYellow.copy(alpha = 0.4f))
+            .background(if (enabled) MaroonPrimary else MaroonPrimary.copy(alpha = 0.4f))
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -367,7 +366,7 @@ fun PrimaryButton(
             text = text,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = ButtonTextAmber,
+            color = Color.White,
             fontFamily = Inter
         )
     }

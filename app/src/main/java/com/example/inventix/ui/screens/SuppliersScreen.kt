@@ -69,8 +69,8 @@ fun SuppliersScreen(onOpenMenu: () -> Unit) {
                     Text(
                         text = "Company",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MutedText,
+                        fontWeight = FontWeight.Bold,
+                        color = ActiveGreen,
                         modifier = Modifier.weight(1f),
                         fontFamily = Inter
                     )

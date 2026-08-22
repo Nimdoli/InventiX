@@ -15,6 +15,7 @@ import com.example.inventix.ui.components.InventixBottomBar
 import com.example.inventix.ui.data.UserRole
 import com.example.inventix.ui.screens.ChooseRoleScreen
 import com.example.inventix.ui.screens.DeliveryScreen
+import com.example.inventix.ui.screens.ForgotPasswordScreen
 import com.example.inventix.ui.screens.LoginScreen
 import com.example.inventix.ui.screens.MenuScreen
 import com.example.inventix.ui.screens.OrdersScreen
@@ -29,6 +30,7 @@ object Routes {
     const val CHOOSE_ROLE = "choose_role"
     const val LOGIN = "login"
     const val SIGN_UP = "sign_up"
+    const val FORGOT_PASSWORD = "forgot_password"
     const val PRODUCTS = "products"
     const val ORDERS = "orders"
     const val REPORTS = "reports"
@@ -88,7 +90,14 @@ fun InventixApp(appViewModel: AppViewModel) {
                             launchSingleTop = true
                         }
                     },
-                    onSignUp = { navController.navigate(Routes.SIGN_UP) }
+                    onSignUp = { navController.navigate(Routes.SIGN_UP) },
+                    onForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) }
+                )
+            }
+            composable(Routes.FORGOT_PASSWORD) {
+                ForgotPasswordScreen(
+                    onSubmit = { navController.popBackStack() },
+                    onBackToLogin = { navController.popBackStack() }
                 )
             }
             composable(Routes.SIGN_UP) {

@@ -2,10 +2,8 @@ package com.example.inventix.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,13 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,19 +37,16 @@ import androidx.compose.ui.unit.sp
 import com.example.inventix.R
 import com.example.inventix.ui.components.PillInputField
 import com.example.inventix.ui.components.PrimaryButton
-import com.example.inventix.ui.theme.BorderBeige
 import com.example.inventix.ui.theme.CreamSurface
 import com.example.inventix.ui.theme.GradientBottomYellow
 import com.example.inventix.ui.theme.GradientTopWhite
-import com.example.inventix.ui.theme.GoogleBorder
 import com.example.inventix.ui.theme.Inter
 import com.example.inventix.ui.theme.MaroonPrimary
 import com.example.inventix.ui.theme.MutedText
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () -> Unit) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun ForgotPasswordScreen(onSubmit: () -> Unit, onBackToLogin: () -> Unit) {
+    var email by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -82,12 +74,12 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                 Image(
                     painter = painterResource(R.drawable.logo_inventix),
                     contentDescription = "InventiX logo",
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.size(72.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "InventiX",
-                    fontSize = 24.sp,
+                    text = "Forgot Password?",
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaroonPrimary,
                     textAlign = TextAlign.Center,
@@ -95,7 +87,7 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Secure Access for Inventory Management",
+                    text = "Enter your email and we'll send you a link to reset your password",
                     fontSize = 14.sp,
                     color = MutedText,
                     textAlign = TextAlign.Center,
@@ -103,93 +95,32 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                 )
             }
             PillInputField(
-                value = username,
-                onValueChange = { username = it },
-                label = "Username",
-                leadingIcon = Icons.Outlined.Person
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                leadingIcon = Icons.Outlined.Email
             )
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PillInputField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = "Password",
-                    leadingIcon = Icons.Outlined.Lock,
-                    isPassword = true
-                )
-                Text(
-                    text = "Forgot password?",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaroonPrimary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(onClick = onForgotPassword),
-                    textAlign = TextAlign.Right,
-                    fontFamily = Inter
-                )
-            }
-            PrimaryButton(text = "Login", onClick = onLogin, modifier = Modifier.fillMaxWidth())
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(BorderBeige))
-                Text(
-                    text = "OR CONTINUE WITH",
-                    fontSize = 12.sp,
-                    color = MutedText,
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    fontFamily = Inter
-                )
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(BorderBeige))
-            }
-            GoogleButton()
+            PrimaryButton(
+                text = "Send Reset Link",
+                onClick = onSubmit,
+                modifier = Modifier.fillMaxWidth()
+            )
             Row(horizontalArrangement = Arrangement.Center) {
                 Text(
-                    text = "Don't have an account? ",
+                    text = "Remembered your password? ",
                     fontSize = 14.sp,
                     color = MutedText,
                     fontFamily = Inter
                 )
                 Text(
-                    text = "Signup",
+                    text = "Login",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaroonPrimary,
                     fontFamily = Inter,
-                    modifier = Modifier.clickable(onClick = onSignUp)
+                    modifier = Modifier.clickable(onClick = onBackToLogin)
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun GoogleButton() {
-    val shape = RoundedCornerShape(4.dp)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .clip(shape)
-            .background(Color.White)
-            .border(1.dp, GoogleBorder, shape)
-            .clickable { },
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_google),
-            contentDescription = "Google",
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = "Sign in with Google",
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaroonPrimary,
-            fontFamily = Inter
-        )
     }
 }
