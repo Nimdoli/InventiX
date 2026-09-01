@@ -76,7 +76,7 @@ fun ProductsScreen(
     stockOverviewSegments: List<DonutSegment>,
     stockOverviewTotal: Int,
     onRefresh: () -> Unit,
-    onAddProduct: (name: String, category: String, price: Double, stock: Int, status: BadgeType) -> Unit,
+    onAddProduct: (name: String, category: String, price: Double, stock: Int) -> Unit,
     onOpenMenu: () -> Unit,
     onOpenPurchaseOrder: () -> Unit
 ) {
@@ -88,7 +88,7 @@ fun ProductsScreen(
             productsLoading -> LoadingState()
             productsError != null -> ErrorState(message = productsError, onRetry = onRefresh)
             products.isEmpty() -> EmptyProductsState(onAddProduct)
-            role == UserRole.CUSTOMER -> CustomerProductsContent(products, stockOverviewSegments, stockOverviewTotal)
+            role == UserRole.CUSTOMER -> CustomerProductsContent(products, stockOverviewSegments, stockOverviewTotal, onAddProduct)
             else -> SupplierProductsContent(products, onAddProduct, onOpenPurchaseOrder)
         }
     }
@@ -127,7 +127,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit) {
 
 @Composable
 private fun EmptyProductsState(
-    onSubmit: (name: String, category: String, price: Double, stock: Int, status: BadgeType) -> Unit
+    onSubmit: (name: String, category: String, price: Double, stock: Int) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     Column(
@@ -172,9 +172,9 @@ private fun EmptyProductsState(
     if (showDialog) {
         AddProductDialog(
             onDismiss = { showDialog = false },
-            onSubmit = { name, category, price, stock, status ->
+            onSubmit = { name, category, price, stock ->
                 showDialog = false
-                onSubmit(name, category, price, stock, status)
+                onSubmit(name, category, price, stock)
             }
         )
     }
@@ -184,10 +184,12 @@ private fun EmptyProductsState(
 private fun CustomerProductsContent(
     products: List<Product>,
     stockOverviewSegments: List<DonutSegment>,
-    stockOverviewTotal: Int
+    stockOverviewTotal: Int,
+    onAddProduct: (name: String, category: String, price: Double, stock: Int) -> Unit
 ) {
     var search by remember { mutableStateOf("") }
     var lowStockOnly by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -197,12 +199,33 @@ private fun CustomerProductsContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            InventixSearchField(
-                value = search,
-                onValueChange = { search = it },
-                placeholder = "Search Product",
-                showFilterIcon = true
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                InventixSearchField(
+                    value = search,
+                    onValueChange = { search = it },
+                    placeholder = "Search Product",
+                    showFilterIcon = true,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(SupplierAddGold)
+                        .clickable { showDialog = true }
+                        .padding(horizontal = 12.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "+ Add Products",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontFamily = Inter
+                    )
+                }
+            }
         }
         if (stockOverviewSegments.isNotEmpty()) {
             item { StockOverviewCard(stockOverviewSegments, stockOverviewTotal) }
@@ -248,6 +271,15 @@ private fun CustomerProductsContent(
                 status = product.status
             )
         }
+    }
+    if (showDialog) {
+        AddProductDialog(
+            onDismiss = { showDialog = false },
+            onSubmit = { name, category, price, stock ->
+                showDialog = false
+                onAddProduct(name, category, price, stock)
+            }
+        )
     }
 }
 
@@ -343,7 +375,7 @@ private fun DonutChart(segments: List<DonutSegment>, total: Int) {
 @Composable
 private fun SupplierProductsContent(
     products: List<Product>,
-    onAddProduct: (name: String, category: String, price: Double, stock: Int, status: BadgeType) -> Unit,
+    onAddProduct: (name: String, category: String, price: Double, stock: Int) -> Unit,
     onOpenPurchaseOrder: () -> Unit
 ) {
     var search by remember { mutableStateOf("") }
@@ -415,7 +447,7 @@ private fun SupplierProductsContent(
             onDismiss = { showDialog = false },
             onSubmit = { name, category, price, stock, status ->
                 showDialog = false
-                onAddProduct(name, category, price, stock, status)
+                onAddProduct(name, category, price, stock)
             }
         )
     }
@@ -424,13 +456,12 @@ private fun SupplierProductsContent(
 @Composable
 private fun AddProductDialog(
     onDismiss: () -> Unit,
-    onSubmit: (name: String, category: String, price: Double, stock: Int, status: BadgeType) -> Unit
+    onSubmit: (name: String, category: String, price: Double, stock: Int) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("") }
-    var lowStock by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -441,26 +472,19 @@ private fun AddProductDialog(
                 PillInputField(value = category, onValueChange = { category = it }, label = "Category", leadingIcon = Icons.Outlined.Category)
                 PillInputField(value = price, onValueChange = { price = it }, label = "Price (LKR)", leadingIcon = Icons.Outlined.Numbers)
                 PillInputField(value = stock, onValueChange = { stock = it }, label = "Stock quantity", leadingIcon = Icons.Outlined.Inventory2)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = if (lowStock) "Marked as Low Stock" else "Marked as In Stock",
-                        fontSize = 13.sp,
-                        color = MutedText,
-                        fontFamily = Inter,
-                        modifier = Modifier.weight(1f)
-                    )
-                    TextButton(onClick = { lowStock = !lowStock }) {
-                        Text("Toggle", fontFamily = Inter)
-                    }
-                }
+                Text(
+                    text = "Stock status (In Stock / Low Stock / Out of Stock) is set automatically based on quantity.",
+                    fontSize = 12.sp,
+                    color = MutedText,
+                    fontFamily = Inter
+                )
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 val priceValue = price.toDoubleOrNull() ?: 0.0
                 val stockValue = stock.toIntOrNull() ?: 0
-                val status = if (lowStock) BadgeType.LOW_STOCK else BadgeType.IN_STOCK
-                onSubmit(name, category, priceValue, stockValue, status)
+                onSubmit(name, category, priceValue, stockValue)
             }) {
                 Text("Add", fontFamily = Inter, fontWeight = FontWeight.Bold, color = MaroonPrimary)
             }

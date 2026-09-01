@@ -143,8 +143,8 @@ fun InventixApp(appViewModel: AppViewModel) {
                     stockOverviewSegments = appViewModel.stockOverviewSegments,
                     stockOverviewTotal = appViewModel.stockOverviewTotal,
                     onRefresh = { appViewModel.loadProducts() },
-                    onAddProduct = { name, category, price, stock, status ->
-                        appViewModel.createProduct(name, category, price, stock, status)
+                    onAddProduct = { name, category, price, stock ->
+                        appViewModel.createProduct(name, category, price, stock)
                     },
                     onOpenMenu = { navController.navigate(Routes.MENU) },
                     onOpenPurchaseOrder = { navController.navigate(Routes.PURCHASE_ORDER) }

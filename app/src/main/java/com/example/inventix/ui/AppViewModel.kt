@@ -161,16 +161,11 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    fun createProduct(name: String, category: String, price: Double, stock: Int, status: BadgeType) {
-        val statusValue = when (status) {
-            BadgeType.LOW_STOCK -> "low_stock"
-            BadgeType.OUT_OF_STOCK -> "out_of_stock"
-            else -> "in_stock"
-        }
+    fun createProduct(name: String, category: String, price: Double, stock: Int) {
         viewModelScope.launch {
             try {
                 NetworkModule.backendApi.createProduct(
-                    ProductCreateDto(name = name, category = category, price = price, stock = stock, status = statusValue)
+                    ProductCreateDto(name = name, category = category, price = price, stock = stock)
                 )
                 loadProducts()
             } catch (e: Exception) {

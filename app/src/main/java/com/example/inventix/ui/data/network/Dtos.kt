@@ -50,8 +50,8 @@ data class ProductCreateDto(
     val name: String,
     val category: String,
     val price: Double,
-    val stock: Int,
-    val status: String
+    val stock: Int
+    // No status field — the backend computes it automatically from stock.
 )
 
 @Serializable
