@@ -445,7 +445,7 @@ private fun SupplierProductsContent(
     if (showDialog) {
         AddProductDialog(
             onDismiss = { showDialog = false },
-            onSubmit = { name, category, price, stock, status ->
+            onSubmit = { name, category, price, stock ->
                 showDialog = false
                 onAddProduct(name, category, price, stock)
             }
