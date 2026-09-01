@@ -20,8 +20,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.example.inventix.R
 import com.example.inventix.ui.components.PillInputField
 import com.example.inventix.ui.components.PrimaryButton
+import com.example.inventix.ui.theme.ActiveGreen
 import com.example.inventix.ui.theme.BorderBeige
 import com.example.inventix.ui.theme.CreamSurface
 import com.example.inventix.ui.theme.GradientBottomYellow
@@ -52,8 +54,14 @@ import com.example.inventix.ui.theme.MaroonPrimary
 import com.example.inventix.ui.theme.MutedText
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () -> Unit) {
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(
+    isLoading: Boolean,
+    errorMessage: String?,
+    onLogin: (email: String, password: String) -> Unit,
+    onForgotPassword: () -> Unit,
+    onGoToSignUp: () -> Unit
+) {
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Column(
@@ -103,10 +111,10 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                 )
             }
             PillInputField(
-                value = username,
-                onValueChange = { username = it },
-                label = "Username",
-                leadingIcon = Icons.Outlined.Person
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                leadingIcon = Icons.Outlined.Email
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 PillInputField(
@@ -128,7 +136,24 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                     fontFamily = Inter
                 )
             }
-            PrimaryButton(text = "Login", onClick = onLogin, modifier = Modifier.fillMaxWidth())
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    fontSize = 13.sp,
+                    color = Color(0xFFC0392B),
+                    textAlign = TextAlign.Center,
+                    fontFamily = Inter
+                )
+            }
+            if (isLoading) {
+                CircularProgressIndicator(color = MaroonPrimary)
+            } else {
+                PrimaryButton(
+                    text = "Login",
+                    onClick = { onLogin(email, password) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -155,9 +180,9 @@ fun LoginScreen(onLogin: () -> Unit, onSignUp: () -> Unit, onForgotPassword: () 
                     text = "Signup",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaroonPrimary,
+                    color = ActiveGreen,
                     fontFamily = Inter,
-                    modifier = Modifier.clickable(onClick = onSignUp)
+                    modifier = Modifier.clickable(onClick = onGoToSignUp)
                 )
             }
         }

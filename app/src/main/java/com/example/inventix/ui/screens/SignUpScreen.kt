@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,11 +51,15 @@ import com.example.inventix.ui.theme.MaroonPrimary
 import com.example.inventix.ui.theme.MutedText
 
 @Composable
-fun SignUpScreen(onCreateAccount: () -> Unit, onBackToLogin: () -> Unit) {
+fun SignUpScreen(
+    isLoading: Boolean,
+    errorMessage: String?,
+    onCreateAccount: (fullName: String, storeName: String, email: String, password: String) -> Unit,
+    onBackToLogin: () -> Unit
+) {
     var fullName by remember { mutableStateOf("") }
     var storeName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Column(
@@ -121,23 +127,30 @@ fun SignUpScreen(onCreateAccount: () -> Unit, onBackToLogin: () -> Unit) {
                 leadingIcon = Icons.Outlined.Email
             )
             PillInputField(
-                value = username,
-                onValueChange = { username = it },
-                label = "Username",
-                leadingIcon = Icons.Outlined.Person
-            )
-            PillInputField(
                 value = password,
                 onValueChange = { password = it },
                 label = "Password",
                 leadingIcon = Icons.Outlined.Lock,
                 isPassword = true
             )
-            PrimaryButton(
-                text = "Create Account",
-                onClick = onCreateAccount,
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    fontSize = 13.sp,
+                    color = Color(0xFFC0392B),
+                    textAlign = TextAlign.Center,
+                    fontFamily = Inter
+                )
+            }
+            if (isLoading) {
+                CircularProgressIndicator(color = MaroonPrimary)
+            } else {
+                PrimaryButton(
+                    text = "Create Account",
+                    onClick = { onCreateAccount(fullName, storeName, email, password) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             Row(horizontalArrangement = Arrangement.Center) {
                 Text(
                     text = "Already have an account? ",

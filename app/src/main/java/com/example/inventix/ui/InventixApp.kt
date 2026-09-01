@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -29,7 +32,7 @@ import com.example.inventix.ui.screens.SuppliersScreen
 object Routes {
     const val CHOOSE_ROLE = "choose_role"
     const val LOGIN = "login"
-    const val SIGN_UP = "sign_up"
+    const val SIGN_UP = "signup"
     const val FORGOT_PASSWORD = "forgot_password"
     const val PRODUCTS = "products"
     const val ORDERS = "orders"
@@ -84,28 +87,48 @@ fun InventixApp(appViewModel: AppViewModel) {
             }
             composable(Routes.LOGIN) {
                 LoginScreen(
-                    onLogin = {
-                        navController.navigate(Routes.PRODUCTS) {
-                            popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
-                            launchSingleTop = true
+                    isLoading = appViewModel.authLoading,
+                    errorMessage = appViewModel.authError,
+                    onLogin = { email, password ->
+                        appViewModel.login(email, password) { success ->
+                            if (success) {
+                                navController.navigate(Routes.PRODUCTS) {
+                                    popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }
                         }
                     },
-                    onSignUp = { navController.navigate(Routes.SIGN_UP) },
-                    onForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) }
-                )
-            }
-            composable(Routes.FORGOT_PASSWORD) {
-                ForgotPasswordScreen(
-                    onSubmit = { navController.popBackStack() },
-                    onBackToLogin = { navController.popBackStack() }
+                    onForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) },
+                    onGoToSignUp = { navController.navigate(Routes.SIGN_UP) }
                 )
             }
             composable(Routes.SIGN_UP) {
                 SignUpScreen(
-                    onCreateAccount = {
-                        navController.navigate(Routes.PRODUCTS) {
-                            popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
-                            launchSingleTop = true
+                    isLoading = appViewModel.authLoading,
+                    errorMessage = appViewModel.authError,
+                    onCreateAccount = { fullName, storeName, email, password ->
+                        appViewModel.register(fullName, storeName, email, password) { success ->
+                            if (success) {
+                                navController.navigate(Routes.PRODUCTS) {
+                                    popUpTo(Routes.CHOOSE_ROLE) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }
+                        }
+                    },
+                    onBackToLogin = { navController.popBackStack() }
+                )
+            }
+            composable(Routes.FORGOT_PASSWORD) {
+                var sent by remember { mutableStateOf(false) }
+                ForgotPasswordScreen(
+                    isLoading = appViewModel.authLoading,
+                    errorMessage = appViewModel.authError,
+                    sentConfirmation = sent,
+                    onSubmit = { email ->
+                        appViewModel.sendPasswordReset(email) { success ->
+                            if (success) sent = true
                         }
                     },
                     onBackToLogin = { navController.popBackStack() }
@@ -115,7 +138,12 @@ fun InventixApp(appViewModel: AppViewModel) {
                 ProductsScreen(
                     role = appViewModel.role ?: UserRole.CUSTOMER,
                     products = appViewModel.products,
-                    onAddProduct = { product -> appViewModel.addProduct(product) },
+                    productsLoading = appViewModel.productsLoading,
+                    productsError = appViewModel.productsError,
+                    onRefresh = { appViewModel.loadProducts() },
+                    onAddProduct = { name, category, price, stock, status ->
+                        appViewModel.createProduct(name, category, price, stock, status)
+                    },
                     onOpenMenu = { navController.navigate(Routes.MENU) },
                     onOpenPurchaseOrder = { navController.navigate(Routes.PURCHASE_ORDER) }
                 )

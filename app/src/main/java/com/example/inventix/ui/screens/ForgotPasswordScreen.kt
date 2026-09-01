@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,7 +47,13 @@ import com.example.inventix.ui.theme.MaroonPrimary
 import com.example.inventix.ui.theme.MutedText
 
 @Composable
-fun ForgotPasswordScreen(onSubmit: () -> Unit, onBackToLogin: () -> Unit) {
+fun ForgotPasswordScreen(
+    isLoading: Boolean,
+    errorMessage: String?,
+    sentConfirmation: Boolean,
+    onSubmit: (email: String) -> Unit,
+    onBackToLogin: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
 
     Column(
@@ -100,11 +108,33 @@ fun ForgotPasswordScreen(onSubmit: () -> Unit, onBackToLogin: () -> Unit) {
                 label = "Email",
                 leadingIcon = Icons.Outlined.Email
             )
-            PrimaryButton(
-                text = "Send Reset Link",
-                onClick = onSubmit,
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (sentConfirmation) {
+                Text(
+                    text = "Check your inbox for a password reset link.",
+                    fontSize = 13.sp,
+                    color = MaroonPrimary,
+                    textAlign = TextAlign.Center,
+                    fontFamily = Inter
+                )
+            }
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    fontSize = 13.sp,
+                    color = Color(0xFFC0392B),
+                    textAlign = TextAlign.Center,
+                    fontFamily = Inter
+                )
+            }
+            if (isLoading) {
+                CircularProgressIndicator(color = MaroonPrimary)
+            } else {
+                PrimaryButton(
+                    text = "Send Reset Link",
+                    onClick = { onSubmit(email) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             Row(horizontalArrangement = Arrangement.Center) {
                 Text(
                     text = "Remembered your password? ",
