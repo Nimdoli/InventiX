@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inventix.ui.data.BadgeType
+import com.example.inventix.ui.data.DonutSegment
 import com.example.inventix.ui.data.Product
 import com.example.inventix.ui.data.UserRole
 import com.example.inventix.ui.data.network.LoginRequest
@@ -16,6 +17,9 @@ import com.example.inventix.ui.data.network.RecoverRequest
 import com.example.inventix.ui.data.network.SignUpMetadata
 import com.example.inventix.ui.data.network.SignUpRequest
 import com.example.inventix.ui.data.network.TokenHolder
+import com.example.inventix.ui.theme.ChartAmber
+import com.example.inventix.ui.theme.ChartGreen
+import com.example.inventix.ui.theme.RedOutOfStock
 import kotlinx.coroutines.launch
 
 class AppViewModel : ViewModel() {
@@ -30,6 +34,16 @@ class AppViewModel : ViewModel() {
         private set
 
     var hasDeliveries by mutableStateOf(false)
+        private set
+
+    var hasReports by mutableStateOf(false)
+        private set
+
+    // ---- Stock overview (donut chart), loaded live from the backend ----
+    var stockOverviewSegments by mutableStateOf<List<DonutSegment>>(emptyList())
+        private set
+
+    var stockOverviewTotal by mutableStateOf(0)
         private set
 
     // ---- Auth state ----
@@ -62,8 +76,11 @@ class AppViewModel : ViewModel() {
         hasProducts = false
         hasOrders = false
         hasDeliveries = false
+        hasReports = false
         TokenHolder.accessToken = null
         products = emptyList()
+        stockOverviewSegments = emptyList()
+        stockOverviewTotal = 0
     }
 
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
@@ -170,6 +187,7 @@ class AppViewModel : ViewModel() {
                 val dtos = NetworkModule.backendApi.listProducts()
                 products = dtos.map { it.toProduct() }
                 hasProducts = products.isNotEmpty()
+                loadStockOverview()
             } catch (e: Exception) {
                 productsError = "Couldn't load products: ${e.message}"
             } finally {
@@ -177,7 +195,32 @@ class AppViewModel : ViewModel() {
             }
         }
     }
+
+    private fun loadStockOverview() {
+        viewModelScope.launch {
+            try {
+                val overview = NetworkModule.backendApi.getStockOverview()
+                stockOverviewTotal = overview.total
+                stockOverviewSegments = overview.segments.map { it.toDonutSegment() }
+            } catch (e: Exception) {
+                // Non-critical — the product list itself already loaded fine, just
+                // leave the chart showing whatever it last had (or empty).
+            }
+        }
+    }
 }
+
+private fun com.example.inventix.ui.data.network.StockSegmentDto.toDonutSegment(): DonutSegment = DonutSegment(
+    label = label,
+    value = value,
+    percentText = "${percent}%",
+    color = when (label) {
+        "In stock" -> ChartGreen
+        "Low stock" -> ChartAmber
+        "Out of stock" -> RedOutOfStock
+        else -> ChartGreen
+    }
+)
 
 private fun ProductDto.toProduct(): Product {
     val status = when (status) {

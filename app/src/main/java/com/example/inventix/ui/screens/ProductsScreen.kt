@@ -53,7 +53,6 @@ import com.example.inventix.ui.components.ProductCard
 import com.example.inventix.ui.data.BadgeType
 import com.example.inventix.ui.data.DonutSegment
 import com.example.inventix.ui.data.Product
-import com.example.inventix.ui.data.StockOverviewSegments
 import com.example.inventix.ui.data.UserRole
 import com.example.inventix.ui.theme.AccentYellow
 import com.example.inventix.ui.theme.ActiveGreen
@@ -74,6 +73,8 @@ fun ProductsScreen(
     products: List<Product>,
     productsLoading: Boolean,
     productsError: String?,
+    stockOverviewSegments: List<DonutSegment>,
+    stockOverviewTotal: Int,
     onRefresh: () -> Unit,
     onAddProduct: (name: String, category: String, price: Double, stock: Int, status: BadgeType) -> Unit,
     onOpenMenu: () -> Unit,
@@ -82,12 +83,12 @@ fun ProductsScreen(
     LaunchedEffect(Unit) { onRefresh() }
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        InventixTopBar(title = "Products", showBack = false, onLeadingClick = onOpenMenu)
+        InventixTopBar(title = "Product", showBack = false, onLeadingClick = onOpenMenu)
         when {
             productsLoading -> LoadingState()
             productsError != null -> ErrorState(message = productsError, onRetry = onRefresh)
             products.isEmpty() -> EmptyProductsState(onAddProduct)
-            role == UserRole.CUSTOMER -> CustomerProductsContent(products)
+            role == UserRole.CUSTOMER -> CustomerProductsContent(products, stockOverviewSegments, stockOverviewTotal)
             else -> SupplierProductsContent(products, onAddProduct, onOpenPurchaseOrder)
         }
     }
@@ -180,7 +181,11 @@ private fun EmptyProductsState(
 }
 
 @Composable
-private fun CustomerProductsContent(products: List<Product>) {
+private fun CustomerProductsContent(
+    products: List<Product>,
+    stockOverviewSegments: List<DonutSegment>,
+    stockOverviewTotal: Int
+) {
     var search by remember { mutableStateOf("") }
     var lowStockOnly by remember { mutableStateOf(false) }
 
@@ -195,11 +200,13 @@ private fun CustomerProductsContent(products: List<Product>) {
             InventixSearchField(
                 value = search,
                 onValueChange = { search = it },
-                placeholder = "Search Products",
+                placeholder = "Search Product",
                 showFilterIcon = true
             )
         }
-        item { StockOverviewCard() }
+        if (stockOverviewSegments.isNotEmpty()) {
+            item { StockOverviewCard(stockOverviewSegments, stockOverviewTotal) }
+        }
         item {
             Column {
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -245,7 +252,7 @@ private fun CustomerProductsContent(products: List<Product>) {
 }
 
 @Composable
-private fun StockOverviewCard() {
+private fun StockOverviewCard(segments: List<DonutSegment>, total: Int) {
     val shape = RoundedCornerShape(10.dp)
     Column(
         modifier = Modifier
@@ -265,10 +272,10 @@ private fun StockOverviewCard() {
         Spacer(modifier = Modifier.height(16.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(contentAlignment = Alignment.Center) {
-                DonutChart(segments = StockOverviewSegments, total = 550)
+                DonutChart(segments = segments, total = total)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "550",
+                        text = "$total",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = DarkValue,
@@ -284,7 +291,7 @@ private fun StockOverviewCard() {
             }
             Spacer(modifier = Modifier.width(20.dp))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                StockOverviewSegments.forEach { segment ->
+                segments.forEach { segment ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier

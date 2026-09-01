@@ -22,4 +22,7 @@ interface BackendApi {
 
     @POST("product")
     suspend fun createProduct(@Body body: ProductCreateDto): ProductDto
+
+    @GET("analytics/stock-overview")
+    suspend fun getStockOverview(): StockOverviewDto
 }

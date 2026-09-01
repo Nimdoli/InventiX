@@ -53,3 +53,9 @@ data class ProductCreateDto(
     val stock: Int,
     val status: String
 )
+
+@Serializable
+data class StockSegmentDto(val label: String, val value: Int, val percent: Double)
+
+@Serializable
+data class StockOverviewDto(val total: Int, val segments: List<StockSegmentDto>)

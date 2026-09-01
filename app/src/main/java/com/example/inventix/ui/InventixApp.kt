@@ -140,6 +140,8 @@ fun InventixApp(appViewModel: AppViewModel) {
                     products = appViewModel.products,
                     productsLoading = appViewModel.productsLoading,
                     productsError = appViewModel.productsError,
+                    stockOverviewSegments = appViewModel.stockOverviewSegments,
+                    stockOverviewTotal = appViewModel.stockOverviewTotal,
                     onRefresh = { appViewModel.loadProducts() },
                     onAddProduct = { name, category, price, stock, status ->
                         appViewModel.createProduct(name, category, price, stock, status)
@@ -156,7 +158,10 @@ fun InventixApp(appViewModel: AppViewModel) {
                 )
             }
             composable(Routes.REPORTS) {
-                ReportsScreen(onOpenMenu = { navController.navigate(Routes.MENU) })
+                ReportsScreen(
+                    hasReports = appViewModel.hasReports,
+                    onOpenMenu = { navController.navigate(Routes.MENU) }
+                )
             }
             composable(Routes.DELIVERY) {
                 DeliveryScreen(

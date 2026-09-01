@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.inventix.ui.components.InventixTopBar
+import com.example.inventix.ui.theme.CreamSurface
 import com.example.inventix.ui.theme.ActiveGreen
 import com.example.inventix.ui.theme.BorderBeige
 import com.example.inventix.ui.theme.DarkHeading
@@ -53,11 +55,15 @@ import com.example.inventix.ui.theme.PendingText
 import com.example.inventix.ui.theme.UnselectedTabBlack
 
 @Composable
-fun ReportsScreen(onOpenMenu: () -> Unit) {
+fun ReportsScreen(hasReports: Boolean, onOpenMenu: () -> Unit) {
     var salesTabSelected by remember { mutableStateOf(true) }
 
     Column(modifier = Modifier.fillMaxSize().background(Color(0xFFFAFAFA))) {
         InventixTopBar(title = "Reports", showBack = false, onLeadingClick = onOpenMenu)
+        if (!hasReports) {
+            NoReportsYetState()
+            return@Column
+        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 24.dp),
@@ -105,6 +111,40 @@ fun ReportsScreen(onOpenMenu: () -> Unit) {
             item { RevenueTrendsCard() }
             item { RecentReportsCard() }
         }
+    }
+}
+
+@Composable
+private fun NoReportsYetState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(60.dp))
+                .background(CreamSurface),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Description,
+                contentDescription = null,
+                tint = MutedText,
+                modifier = Modifier.size(56.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "No reports yet",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = DarkHeading,
+            fontFamily = Inter
+        )
     }
 }
 
